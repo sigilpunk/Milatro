@@ -513,7 +513,7 @@ SMODS.Joker {
     cost = 5,
     atlas = "Jokers",
     pos = { x = 1, y = 2 },
-    config = { extra = { money_mod = 2, money = 0 } },
+    config = { extra = { dollars_mod = 2, dollars = 0 } },
     loc_txt = {
         name = "Yellow Card",
         text = {
@@ -525,16 +525,16 @@ SMODS.Joker {
     },
     loc_vars = function(self, info_queue, card)
         return { vars = { 
-            card.ability.extra.money_mod, card.ability.extra.money
+            card.ability.extra.dollars_mod, card.ability.extra.dollars
         } }
     end,
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
-            card.ability.extra.money = card.ability.extra.money + card.ability.extra.money_mod
+            card.ability.extra.dollars = card.ability.extra.dollars + card.ability.extra.dollars_mod
             return {
-                message = localize { type = 'variable', key = 'a_dollars', vars = { card.ability.extra.money_mod } },
+                message = localize { type = 'variable', key = 'a_dollars', vars = { card.ability.extra.dollars_mod } },
                 colour = G.C.MONEY,
-                dollars = card.ability.extra.money
+                dollars = card.ability.extra.dollars
             }
         end
     end,
