@@ -530,18 +530,25 @@ SMODS.Joker {
     end,
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
+            -- Ensure the extra table exists and has default values
+            card.ability.extra = card.ability.extra or {}
+            card.ability.extra.dollars = card.ability.extra.dollars or 0
+            card.ability.extra.dollars_mod = card.ability.extra.dollars_mod or 2
+            
             card.ability.extra.dollars = card.ability.extra.dollars + card.ability.extra.dollars_mod
             return {
-                message = localize { type = 'variable', key = 'a_dollars', vars = { card.ability.extra.dollars_mod } },
+                message = "+$"..card.ability.extra.dollars_mod,
                 colour = G.C.MONEY,
-                -- dollars = card.ability.extra.dollars
+                card = card,
             }
         end
     end,
+
     calc_dollar_bonus = function(self, card)
-        if card.ability.extra.dollars > 0 then
+        if card.ability.extra and card.ability.extra.dollars and card.ability.extra.dollars > 0 then
             return card.ability.extra.dollars
         end
+        return 0
     end,
 }
 
