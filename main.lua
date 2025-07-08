@@ -534,8 +534,13 @@ SMODS.Joker {
             return {
                 message = localize { type = 'variable', key = 'a_dollars', vars = { card.ability.extra.dollars_mod } },
                 colour = G.C.MONEY,
-                dollars = card.ability.extra.dollars
+                -- dollars = card.ability.extra.dollars
             }
+        end
+    end,
+    calc_dollar_bonus = function(self, card)
+        if card.ability.extra.dollars > 0 then
+            return card.ability.extra.dollars
         end
     end,
 }
