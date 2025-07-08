@@ -530,8 +530,8 @@ SMODS.Joker {
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
             return {
-                message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.money_mod } },
-                colour = G.C.MONEY,
+                -- message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.money_mod } },
+                -- colour = G.C.MONEY,
                 dollars = card.ability.extra.money_mod
             }
         end
