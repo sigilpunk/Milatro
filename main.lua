@@ -54,6 +54,10 @@ SMODS.Joker {
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
     
     -- Function that triggers when blind is selected
     calculate = function(self, card, context)
@@ -139,6 +143,10 @@ SMODS.Joker {
         if not from_debuff then
             play_sound("mltro_mj_death", 1, 1.5)
         end
+    end,
+
+    in_pool = function(self)
+        allow_duplicates = false
     end,
 
     calculate = function(self, card, context)
@@ -249,6 +257,10 @@ SMODS.Joker {
         return {vars = {job_tally}}
     end,
 
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
     calc_dollar_bonus = function(self, card)
         local job_tally = 0
         for _, playing_card in pairs(G.playing_cards or {}) do
@@ -291,6 +303,10 @@ SMODS.Joker {
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
 
     calculate = function(self, card, context)
         if context.setting_blind then
@@ -348,6 +364,10 @@ SMODS.Joker {
     eternal_compat = true,
     perishable_compat = true,
 
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
     calculate = function(self, card, context)
         if context.repetition and context.cardarea == G.play and (context.other_card:is_face() or not context.other_card:is_face()) then
             return {
@@ -381,6 +401,10 @@ SMODS.Joker {
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
 
     calculate = function(self, card, context)
         if context.pre_discard then
@@ -432,6 +456,10 @@ SMODS.Joker {
     blueprint_compat = true,
     eternal_compat = true,
     perishable_compat = true,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
 
     add_to_deck = function(self, card, from_debuff)
         if not from_debuff then
@@ -487,6 +515,11 @@ SMODS.Joker {
             card.ability.extra.chip_mod, card.ability.extra.chips
         } }
     end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
             card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
@@ -528,6 +561,11 @@ SMODS.Joker {
             card.ability.extra.dollars_mod, card.ability.extra.dollars
         } }
     end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
             -- Ensure the extra table exists and has default values
@@ -545,7 +583,7 @@ SMODS.Joker {
     end,
 
     calc_dollar_bonus = function(self, card)
-        if card.ability.extra and card.ability.extra.dollars and card.ability.extra.dollars > 0 then
+        if card.ability.extra.dollars > 0 then
             return card.ability.extra.dollars
         end
         return 0
