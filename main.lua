@@ -470,6 +470,7 @@ SMODS.Joker {
     discovered = false,
     rarity = 1,
     cost = 5,
+    atlas = "Jokers",
     pos = { x = 0, y = 2 },
     config = { extra = { chip_mod = 5, chips = 0 } },
     loc_txt = {
@@ -490,13 +491,13 @@ SMODS.Joker {
         if context.skipping_booster and not context.blueprint then
             card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
             return {
-                message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.chip_mod } },
+                message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chip_mod } },
                 colour = G.C.BLUE,
             }
         end
         if context.joker_main then
             return {
-                mult = card.ability.extra.chips
+                chips = card.ability.extra.chips
             }
         end
     end,
