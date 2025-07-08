@@ -505,7 +505,7 @@ SMODS.Joker {
 
 -- yellow card
 SMODS.Joker {
-    key = "blue_card",
+    key = "yellow_card",
     blueprint_compat = true,
     perishable_compat = false,
     discovered = false,
