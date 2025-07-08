@@ -1,0 +1,1 @@
+ffmpeg -i "./assets/2x/Jokers.png" -vf scale=71:95 "./assets/1x/Jokers.png"
