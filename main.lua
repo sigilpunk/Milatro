@@ -515,10 +515,10 @@ SMODS.Joker {
     pos = { x = 0, y = 2 },
     config = { extra = { money_mod = 3 } },
     loc_txt = {
-        name = "Blue Card",
+        name = "Yellow Card",
         text = {
-            "This Joker gains",
-            "{C:money}+#1#{} Chips when any",
+            "This Joker gives",
+            "{C:money}$#1#{} when any",
             "{C:attention}Booster Pack{} is skipped",
         }
     },
