@@ -475,8 +475,10 @@ SMODS.Joker {
     loc_txt = {
         name = "Blue Card",
         text = {
-            "This Joker gains {C:chips}+5{} Chips when any {C:attention}Booster Pack{} is skipped.",
-            "{C:inactive}(currently {}{C:chips}+#1#{}{C:inactive} Chips){}"
+            "This Joker gains",
+            "{C:chips}+#1#{} Chips when any",
+            "{C:attention}Booster Pack{} is skipped",
+            "{C:inactive}(currently {}{C:chips}+#2#{}{C:inactive} Chips){}"
         }
     },
     loc_vars = function(self, info_queue, card)
