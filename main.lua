@@ -517,22 +517,24 @@ SMODS.Joker {
     loc_txt = {
         name = "Yellow Card",
         text = {
-            "This Joker gives",
-            "{C:money}$#1#{} when any",
+            "This Joker gains",
+            "{C:money}#1#{} when any",
             "{C:attention}Booster Pack{} is skipped",
+            "{C:inactive}(currently {}{C:money}#2#{}{C:inactive}){}"
         }
     },
     loc_vars = function(self, info_queue, card)
         return { vars = { 
-            card.ability.extra.money_mod
+            card.ability.extra.money_mod, card.ability.extra.money
         } }
     end,
     calculate = function(self, card, context)
         if context.skipping_booster and not context.blueprint then
+            card.ability.extra.money = card.ability.extra.money + card.ability.extra.money_mod
             return {
-                -- message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.money_mod } },
-                -- colour = G.C.MONEY,
-                dollars = card.ability.extra.money_mod
+                message = localize { type = 'variable', key = 'a_dollars', vars = { card.ability.extra.money_mod } },
+                colour = G.C.MONEY,
+                dollars = card.ability.extra.money
             }
         end
         if context.joker_main then
