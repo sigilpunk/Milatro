@@ -503,6 +503,46 @@ SMODS.Joker {
     end,
 }
 
+-- yellow card
+SMODS.Joker {
+    key = "blue_card",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    atlas = "Jokers",
+    pos = { x = 0, y = 2 },
+    config = { extra = { money_mod = 3 } },
+    loc_txt = {
+        name = "Blue Card",
+        text = {
+            "This Joker gains",
+            "{C:money}+#1#{} Chips when any",
+            "{C:attention}Booster Pack{} is skipped",
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.money_mod
+        } }
+    end,
+    calculate = function(self, card, context)
+        if context.skipping_booster and not context.blueprint then
+            return {
+                message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.money_mod } },
+                colour = G.C.MONEY,
+                dollars = card.ability.extra.money_mod
+            }
+        end
+        if context.joker_main then
+            return {
+                chips = card.ability.extra.chips
+            }
+        end
+    end,
+}
+
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
