@@ -518,9 +518,9 @@ SMODS.Joker {
         name = "Yellow Card",
         text = {
             "This Joker gains",
-            "{C:money}#1#{} when any",
+            "{C:money}$#1#{} when any",
             "{C:attention}Booster Pack{} is skipped",
-            "{C:inactive}(currently {}{C:money}#2#{}{C:inactive}){}"
+            "{C:inactive}(currently {}{C:money}$#2#{}{C:inactive}){}"
         }
     },
     loc_vars = function(self, info_queue, card)
