@@ -537,11 +537,6 @@ SMODS.Joker {
                 dollars = card.ability.extra.money
             }
         end
-        if context.joker_main then
-            return {
-                chips = card.ability.extra.chips
-            }
-        end
     end,
 }
 
