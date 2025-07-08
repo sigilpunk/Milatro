@@ -512,7 +512,7 @@ SMODS.Joker {
     rarity = 1,
     cost = 5,
     atlas = "Jokers",
-    pos = { x = 0, y = 2 },
+    pos = { x = 1, y = 2 },
     config = { extra = { money_mod = 3 } },
     loc_txt = {
         name = "Yellow Card",
