@@ -49,7 +49,7 @@ SMODS.Joker {
     cost = 7,
     atlas = "Jokers",
     pos = {x = 0, y = 0},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -118,7 +118,7 @@ SMODS.Joker {
     cost = 4,
     atlas = "Jokers",
     pos = {x = 1, y = 0},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -235,7 +235,7 @@ SMODS.Joker {
     cost = 7,
     atlas = "Jokers",
     pos = {x = 2, y = 0},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -286,7 +286,7 @@ SMODS.Joker {
     cost = 7,
     atlas = "Jokers",
     pos = {x = 3, y = 0},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -342,7 +342,7 @@ SMODS.Joker {
     cost = 7,
     atlas = "Jokers",
     pos = {x = 0, y = 1},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -376,7 +376,7 @@ SMODS.Joker {
     cost = 8,
     atlas = "Jokers",
     pos = {x = 1, y = 1},
-    unlocked = false,
+    
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -427,7 +427,7 @@ SMODS.Joker {
     cost = 7,
     atlas = "Jokers",
     pos = {x = 3, y = 1},
-    unlocked = false,
+
     discovered = false,
     blueprint_compat = true,
     eternal_compat = true,
@@ -461,6 +461,45 @@ SMODS.Joker {
         end
     end
 }
+
+-- blue card
+SMODS.Joker {
+    key = "blue_card",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    pos = { x = 0, y = 2 },
+    config = { extra = { chip_mod = 5, chips = 0 } },
+    loc_txt = {
+        name = "Blue Card",
+        text = {
+            "This Joker gains {C:chips}+5{} Chips when any {C:attention}Booster Pack{} is skipped.",
+            "{C:inactive}(currently {}{C:chips}+#1#{}{C:inactive} Chips){}"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.chip_mod, card.ability.extra.chips
+        } }
+    end,
+    calculate = function(self, card, context)
+        if context.skipping_booster and not context.blueprint then
+            card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_mod
+            return {
+                message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.chip_mod } },
+                colour = G.C.BLUE,
+            }
+        end
+        if context.joker_main then
+            return {
+                mult = card.ability.extra.chips
+            }
+        end
+    end,
+}
+
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
