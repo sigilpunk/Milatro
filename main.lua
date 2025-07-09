@@ -97,9 +97,6 @@ SMODS.Joker {
 }
 
 -- CEO of Idiot
---- TODO:
---- - BUGFIX: Discarded fours trigger downgrade when debuffed, check flush with 4 when debuffed too (thatnky you sober milo)
---- - POSSIBLE BUG: Dupliactes happened but it meight be because i spawned it in with debug puslus
 SMODS.Joker {
     key = "ceoofidiot",
     loc_txt = {
@@ -191,7 +188,7 @@ SMODS.Joker {
 
         if context.pre_discard then
             for _, discarded_card in ipairs(context.full_hand) do
-                if discarded_card:get_id() == 4 then
+                if discarded_card:get_id() == 4 and not discarded_card.debuff then
                     if card.ability.extra.Xmult > 1 and card.ability.extra.Xmult - 0.25 >= 1 then
                         card.ability.extra.Xmult = card.ability.extra.Xmult - 0.25
                         return {
@@ -200,7 +197,15 @@ SMODS.Joker {
                             card = card,
                             sound = "mltro_mj_downgrade"
                         }
+                    elseif discarded_card:get_id() == 4 and discarded_card.debuff then
+                        return {
+                            message = "Debuffed!",
+                            colour = G.C.RED,
+                            card = card
+                        }
                     end
+                else
+                    
                 end
             end
         end
@@ -219,9 +224,6 @@ SMODS.Joker {
 }
 
 -- J*b Application
----
---- TODO:
---- - Return joker status when 16 ehnahnced cards 
 SMODS.Joker {
     key = "jobapp",
     loc_txt = {
@@ -392,8 +394,8 @@ SMODS.Joker {
             
         }
     },
-    rarity = 3,
-    cost = 8,
+    rarity = 2,
+    cost = 6,
     atlas = "Jokers",
     pos = {x = 1, y = 1},
     
@@ -588,6 +590,61 @@ SMODS.Joker {
         end
         return 0
     end,
+}
+
+-- yo gurt
+SMODS.Joker {
+    key = "yo gurt",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    atlas = "Jokers",
+    pos = { x = 2, y = 2 },
+    config = { extra = { rounds_alive = 5, health = 5 } },
+    loc_txt = {
+        name = "yo gurt",
+        text = {
+            "{C:edition}Balances{} {C:chips}chips{} and {C:mult}mult{}",
+            "Joker is destroyed after {C:attention}#1#{} rounds played",
+            "{C:inactive}({}{C:attention}#2#{}{C:inactive} round left){}"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.rounds_alive, card.ability.extra.health
+        } }
+    end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return {
+                balance = true
+            }
+        end
+        if context.final_scoring_step and not context.blueprint then
+            if card.ability.extra.health > 0 then
+                card.ability.extra.health = card.ability.extra.health - 1
+                return {
+                    message = "Yum!",
+                    colour = G.C.PURPLE,
+                    card = card,
+                }
+            elseif card.ability.extra.health == 0 then
+                return {
+                    message = "Empty!",
+                    colour = G.C.RED,
+                    card = card,
+                    remove = true
+                }
+            end
+        end
+    end
 }
 
 
