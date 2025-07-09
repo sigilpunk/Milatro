@@ -186,7 +186,7 @@ SMODS.Joker {
             end
         end
 
-        if context.pre_discard then
+        if context.pre_discard and not context.blueprint then
             for _, discarded_card in ipairs(context.full_hand) do
                 if discarded_card:get_id() == 4 and not discarded_card.debuff then
                     if card.ability.extra.Xmult > 1 and card.ability.extra.Xmult - 0.25 >= 1 then
@@ -598,7 +598,7 @@ SMODS.Joker {
     blueprint_compat = true,
     perishable_compat = false,
     discovered = false,
-    rarity = 1,
+    rarity = 2,
     cost = 5,
     atlas = "Jokers",
     pos = { x = 2, y = 2 },
@@ -609,7 +609,7 @@ SMODS.Joker {
             "Balances {C:chips}Chips{} and {C:mult}Mult{}",
             "Joker is destroyed after",
             "{C:attention}#1#{} rounds played",
-            "{C:inactive}({}{C:attention}#2#{}{C:inactive} round left){}"
+            "{C:inactive}({}{C:attention}#2#{}{C:inactive} rounds left){}"
         }
     },
     loc_vars = function(self, info_queue, card)
@@ -628,19 +628,26 @@ SMODS.Joker {
                 balance = true
             }
         end
-        if context.end_of_round and not context.blueprint then
+        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
             if card.ability.extra.health > 0 then
                 card.ability.extra.health = card.ability.extra.health - 1
-                return {
-                    message = "Yum!",
-                    colour = G.C.PURPLE,
-                    card = card,
-                }
+                if card.ability.extra.health == 0 then
+                    card:start_dissolve()
+                    return {
+                        message = "Empty!",
+                        colour = G.C.RED,
+                    }
+                else
+                    return {
+                        message = "Yum!",
+                        colour = G.C.PURPLE,
+                    }
+                end
             elseif card.ability.extra.health == 0 then
+                card:start_dissolve()
                 return {
                     message = "Empty!",
                     colour = G.C.RED,
-                    remove = true
                 }
             end
         end
