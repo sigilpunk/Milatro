@@ -606,8 +606,9 @@ SMODS.Joker {
     loc_txt = {
         name = "yo gurt",
         text = {
-            "{C:edition}Balances{} {C:chips}chips{} and {C:mult}mult{}",
-            "Joker is destroyed after {C:attention}#1#{} rounds played",
+            "Balances {C:chips}Chips{} and {C:mult}Mult{}",
+            "Joker is destroyed after",
+            "{C:attention}#1#{} rounds played",
             "{C:inactive}({}{C:attention}#2#{}{C:inactive} round left){}"
         }
     },
@@ -627,7 +628,7 @@ SMODS.Joker {
                 balance = true
             }
         end
-        if context.final_scoring_step and not context.blueprint then
+        if context.end_of_round and not context.blueprint then
             if card.ability.extra.health > 0 then
                 card.ability.extra.health = card.ability.extra.health - 1
                 return {
@@ -639,7 +640,6 @@ SMODS.Joker {
                 return {
                     message = "Empty!",
                     colour = G.C.RED,
-                    card = card,
                     remove = true
                 }
             end
