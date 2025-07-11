@@ -7,11 +7,20 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
+-- Jokers atlas
 SMODS.Atlas{
     key = "Jokers",
     path = "Jokers.png",
     px = 71,
     py = 95
+}
+
+-- Tarots atlas
+SMODS.Atlas{
+    key = "Tarots",
+    path = "Tarots.png",
+    px = 71,
+    py = 95,
 }
 
 SMODS.Sound {
