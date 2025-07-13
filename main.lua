@@ -597,7 +597,6 @@ SMODS.Joker {
         if card.ability.extra.dollars > 0 then
             return card.ability.extra.dollars
         end
-        return 0
     end,
 }
 
@@ -663,6 +662,187 @@ SMODS.Joker {
     end
 }
 
+-- four tarot
+SMODS.Tarot {
+    key = "four_tarot",
+    set = "Tarot",
+    atlas = "Tarots",
+    pos = {x = 0, y = 0},
+    cost = 3,
+    config = { max_highlighted = 2 },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.max_highlighted
+            }
+        }
+    end,
+    unlocked = true, 
+    discovered = false,
+    loc_txt = {
+        name = "four",
+        text = {
+            "Sets the rank of {C:attention}#1#{}",
+            "selected cards to {C:attention}4{}"
+        }
+    },
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
+    use = function(self, card, area)
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.4,
+            func = function()
+                play_sound('tarot1')
+                card:juice_up(0.3, 0.5)
+                return true
+            end
+        }))
+        for i = 1, #G.hand.highlighted do
+            local percent = 1.15 - (i - 0.999) / (#G.hand.highlighted - 0.998) * 0.3
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.15,
+                func = function()
+                    G.hand.highlighted[i]:flip()
+                    play_sound('card1', percent)
+                    G.hand.highlighted[i]:juice_up(0.3, 0.3)
+                    return true
+                end
+            }))
+        end
+        delay(0.2)
+        for i = 1, #G.hand.highlighted do
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.1,
+                func = function()
+                    -- SMODS.modify_rank will increment/decrement a given card's rank by a given amount
+                    local card_rank = G.hand.highlighted[i]:get_id()
+                    local delta = card_rank - 4
+                    assert(SMODS.modify_rank(G.hand.highlighted[i], -delta))
+                    return true
+                end
+            }))
+        end
+        for i = 1, #G.hand.highlighted do
+            local percent = 0.85 + (i - 0.999) / (#G.hand.highlighted - 0.998) * 0.3
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.15,
+                func = function()
+                    G.hand.highlighted[i]:flip()
+                    play_sound('tarot2', percent, 0.6)
+                    G.hand.highlighted[i]:juice_up(0.3, 0.3)
+                    return true
+                end
+            }))
+        end
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.2,
+            func = function()
+                G.hand:unhighlight_all()
+                return true
+            end
+        }))
+        delay(0.5)
+    end,
+}
+
+-- SMODS.PokerHandPart {
+--     key = "four_flush",
+--     evaluate = function(parts, hand)
+--         print(hand)
+--         return {}
+--     end
+-- }
+
+
+-- Flush Four PokerHandPart (4 cards of same suit)
+SMODS.PokerHandPart {
+    key = "flush_four",
+    func = function(hand)
+        local ret = {}
+        local suits = {}
+        
+        -- Group cards by suit
+        for i = 1, #hand do
+            local suit = hand[i].base.suit
+            if not suits[suit] then
+                suits[suit] = {}
+            end
+            table.insert(suits[suit], hand[i])
+        end
+        
+        -- Check for suits with exactly 4 cards
+        for suit, cards in pairs(suits) do
+            if #cards == 4 then
+                ret[#ret + 1] = cards
+            end
+        end
+        
+        return ret
+    end
+}
+
+-- four of a four
+SMODS.PokerHand {
+    key = "four_of_a_four",
+    mult = 44,
+    chips = 44,
+    l_mult = 4, 
+    l_chips = 44,
+    -- visible = false,
+    loc_txt = {
+        name = "Four Of A Four",
+        description = {
+            "4 cards ranked 4 sharing the same suit"
+        }
+    },
+    example = {
+        {'C_4', true },
+        {'C_4', true },
+        {'C_4', true },
+        {'C_4', true },
+        {'H_A', false}
+    },
+    evaluate = function(parts, hand)
+        if next(parts._4) and next(parts.mltro_flush_four) then
+            local four_cards = parts._4[1]
+            local flush_four_cards = parts.mltro_flush_four[1]
+
+            if #four_cards == 4 and #flush_four_cards == 4 then
+                local all_fours_in_flush = true
+                for i = 1, #four_cards do
+                    local found = false
+                    for j = 1, #flush_four_cards do
+                        if four_cards[i] == flush_four_cards[j] then
+                            found = true
+                            break
+                        end
+                    end
+                    if not found then
+                        all_fours_in_flush = false
+                        break
+                    end
+                end
+                
+                if all_fours_in_flush then
+                    return {
+                        SMODS.merge_lists(parts.mltro_flush_four, parts._4, parts._flush),
+                        name = "Four Of A Four",
+                        flush = parts.mltro_flush_four
+                    }
+                end
+            end
+        end
+        return {}
+    end
+}
 
 ----------------------------------------------
 ------------MOD CODE END----------------------

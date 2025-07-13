@@ -1,6 +1,7 @@
 import math
 from PIL import Image
 from pathlib import Path
+from sys import argv
 
 def optimal_grid(J: int):
     best = None
@@ -38,5 +39,5 @@ size2x = tuple(optimal_dim[i] * dim["2x"][i] for i in range(2))
 canvas1x = Image.new(mode="RGBA", size=size1x, color=(0, 0, 0, 0))
 canvas2x = Image.new(mode="RGBA", size=size2x, color=(0, 0, 0, 0))
 
-canvas1x.save(Path("./assets/1x/Jokers.png"))
-canvas2x.save(Path("./assets/2x/Jokers.png"))
+canvas1x.save(Path(f"./assets/1x/{argv[1]}"))
+canvas2x.save(Path(f"./assets/2x/{argv[1]}"))
