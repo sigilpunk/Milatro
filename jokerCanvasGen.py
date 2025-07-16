@@ -15,7 +15,7 @@ def optimal_grid(J: int):
 
 dim = {
     "1x": tuple([71, 95]),
-    "2x": tuple([142, 190])
+    "2x": tuple([142, 190]),
 }
 
 valid_input = False
