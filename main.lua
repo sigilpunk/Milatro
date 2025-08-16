@@ -20,7 +20,55 @@
 ---     - Food Fight: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots
 ---     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank
 
+--- HELPER FUNCTIONS
+check_synergy = function (keys)
+    local jokers = G.jokers.cards
+    local n_found = 0
+    for i = #jokers, 1, -1 do
+        local joker = jokers[i]
+        local current_key = joker.config.center.key
+        for _, v in pairs(keys) do
+            if v == current_key then
+                n_found = n_found + 1
+                joker:start_dissolve()
+            end
+        end
+    end
+    if n_found >= #keys then
+        return true
+    else
+        return false
+    end
+end
 
+check_jokers = function (keys)
+    local jokers = G.jokers.cards
+    local n_found = 0
+    for i = #jokers, 1, -1 do
+        local joker = jokers[i]
+        local current_key = joker.config.center.key
+        for _, v in pairs(keys) do
+            if v == current_key then
+                n_found = n_found + 1
+            end
+        end
+    end
+    if n_found >= #keys then
+        return true
+    else
+        return false
+    end
+end
+
+add_joker = function (keys)
+    for _, key in ipairs(keys) do
+        local joker = create_card('Joker', G.jokers, nil, nil, nil, nil, key)
+        joker:add_to_deck()
+        G.jokers:emplace(joker)
+    end
+end
+
+--- ATLASES
 -- Jokers atlas
 SMODS.Atlas {
     key = "Jokers",
@@ -70,7 +118,7 @@ SMODS.Sound {
     key = "mj_downgrade",
     path = "mj_downgrade.wav"
 }
-
+--- JOKERS
 -- planets_vro
 SMODS.Joker {
     key = "planets_vro",
@@ -855,6 +903,7 @@ SMODS.Joker {
         end
     end
 }
+
  -- fuck you joker
 SMODS.Joker {
     key = "fuck_you",
@@ -880,9 +929,48 @@ SMODS.Joker {
 
     calculate = function (self, card, context)
         return true
+    end,
+
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("fuck you", G.C.BLACK, G.C.WHITE, 1.2)
     end
 }
 
+--- SYNERGY JOKERS
+-- Yaoi
+SMODS.Joker {
+    key = "syn_yaoi",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 1,
+    cost = 0,
+    config = {},
+    atlas = "Jokers",
+    pos = { x = 2, y = 3 },
+    loc_txt = {
+        name = "Yaoi",
+        text = {
+            "gay men"
+        }
+    },
+
+    in_pool = function(self)
+        allow_duplicates = false
+    end,
+
+    calculate = function (self, card, context)
+        if context.before and not context.blueprint then
+            check_synergy({"j_scary_face", "j_smiley"})
+        end
+    end,
+
+    set_badges = function (self, card, badges)
+        badges[#badges+1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    end
+}
+
+--- TAROTS
 -- four tarot
 SMODS.Tarot {
     key = "four_tarot",
@@ -974,6 +1062,7 @@ SMODS.Tarot {
     end,
 }
 
+--- SEALS
 -- Starman Seal
 SMODS.Seal {
     key = "starman",
@@ -1058,7 +1147,7 @@ SMODS.Seal {
 --     end
 -- }
 
-
+--- HANDS
 -- Flush Four PokerHandPart (4 cards of same suit)
 SMODS.PokerHandPart {
     key = "flush_four",
@@ -1141,6 +1230,8 @@ SMODS.PokerHand {
     end
 }
 
+
+--- BLINDS
 -- evil blind
 -- "fuck you"
 -- insane chip goal
