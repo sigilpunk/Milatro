@@ -12,6 +12,13 @@
 --- TODO:
 --- Create Spectral Card for Starman Seal
 --- Create Planet Card for Four Of A Four
+--- Create Cash toker (synergy with raised fist: raise lowest card in hand by one rank)
+--- Joker Synergies: create new joker when certain jokers are obtained, destroys synergized jokers
+---     - balatro
+---     - Yaoi: Scary Face + Smiling Face = x2 joker abilities
+---     - Geology: Rough Gem + Bloodstone + Arrowhead + Onyx Agate = 100% chance $1, X1.5 mult, +50 chips, +7 mult
+---     - Food Fight: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots
+---     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank
 
 
 -- Jokers atlas
@@ -760,6 +767,119 @@ SMODS.Joker {
             end
             delay(0.5)
         end
+    end
+}
+
+-- the deal
+-- howie mandel
+SMODS.Joker {
+    key = "the_deal",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 2,
+    cost = 1,
+    config = {extra = {steal_amount = 5, steal_add = 5, reward = 5}},
+    atlas = "Jokers",
+    pos = { x = 0, y = 3 },
+    loc_txt = {
+        name = "The Deal",
+        text = {
+            "{C:chips}-#1# chips{}",
+            "{C:money}$#3#{} for every {C:chips}#2# chips{} stolen",
+            "{C:chips}+#2# chips{} stolen at the end of each round"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.steal_amount, card.ability.extra.steal_add, card.ability.extra.reward
+        } }
+    end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+        if G.GAME.round_resets.ante >= 3 then
+            return true
+        else
+            return false
+        end
+    end,
+
+    calculate = function (self, card, context)
+        if context.joker_main or context.blueprint then
+        -- if context.cardarea == G.play then
+            local dollar_mod = (card.ability.extra.steal_amount / card.ability.extra.steal_add) * card.ability.extra.reward
+            return {
+                chips = -card.ability.extra.steal_amount,
+                dollars = dollar_mod
+            }
+        end
+        if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+            local messages = {"Deal!", "No Deal!"}
+            card.ability.extra.steal_amount = card.ability.extra.steal_amount + card.ability.extra.steal_add
+            return {
+                message = messages[math.random(1, #messages)],
+                colour = G.C.FILTER
+            }
+        end
+    end
+}
+
+-- teague westra
+SMODS.Joker {
+    key = "teague_westra",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 1,
+    cost = 0,
+    config = {},
+    atlas = "Jokers",
+    pos = { x = 1, y = 3 },
+    loc_txt = {
+        name = "teague westra",
+        text = {
+            "does nothing"
+        }
+    },
+
+    in_pool = function(self)
+        allow_duplicates = true
+    end,
+
+    calculate = function (self, card, context)
+        if context.main_joker or context.blueprint then
+            return {
+                chips = 0
+            }
+        end
+    end
+}
+ -- fuck you joker
+SMODS.Joker {
+    key = "fuck_you",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 1,
+    cost = 0,
+    config = {},
+    atlas = "Jokers",
+    pos = { x = 2, y = 3 },
+    loc_txt = {
+        name = "i fucking hate you and im going to kill you",
+        text = {
+            "{C:attention}destroys{}",
+            "{s:0.6}\"fuck you\"{}"
+        }
+    },
+
+    in_pool = function(self)
+        allow_duplicates = true
+    end,
+
+    calculate = function (self, card, context)
+        return true
     end
 }
 
