@@ -15,31 +15,24 @@
 --- Create Cash toker (synergy with raised fist: raise lowest card in hand by one rank)
 --- Joker Synergies: create new joker when certain jokers are obtained, destroys synergized jokers
 ---     - balatro
----     - Yaoi: Scary Face + Smiling Face = x2 joker abilities
----     - Geology: Rough Gem + Bloodstone + Arrowhead + Onyx Agate = 100% chance $1, X1.5 mult, +50 chips, +7 mult
----     - Food Fight: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots
+---     - Yaoi: Scary Face + Smiling Face = x2 joker abilities | DONE!
+---     - Geology: Rough Gem + Bloodstone + Arrowhead + Onyx Agate = 100% chance $1, X1.5 mult, +50 chips, +7 mult | DONE
+---     - Refrigerator: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots | DONE
 ---     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank
+--- 
+--- Joker ideas:
+---     - Bodyguard: Disables a boss blind, takes $10 when disabling a boss blind
+---     - Riff Raff but awesome: spawns one random Milatro joker then fucking dies
+---     - Tritanopia: Cards give the same amount of mult as they do chips
+---     - Sanctified Sword: Destroys every joker to the left, 
 
---- HELPER FUNCTIONS
-check_synergy = function (keys)
-    local jokers = G.jokers.cards
-    local n_found = 0
-    for i = #jokers, 1, -1 do
-        local joker = jokers[i]
-        local current_key = joker.config.center.key
-        for _, v in pairs(keys) do
-            if v == current_key then
-                n_found = n_found + 1
-                joker:start_dissolve()
-            end
-        end
-    end
-    if n_found >= #keys then
-        return true
-    else
-        return false
-    end
-end
+--- HELPER FUNCTIONS AND DEFINITIONS
+
+LOGGING_ENABLED = false
+
+joker_categories = {
+    food = {"j_egg", "j_ice_cream", "j_cavendish", "j_turtle_bean", "j_diet_cola", "j_popcorn", "j_ramen", "j_selzer", "j_gros_michel", "j_mltro_yo_gurt", "j_mltro_applebees"}
+}
 
 check_jokers = function (keys)
     local jokers = G.jokers.cards
@@ -60,12 +53,211 @@ check_jokers = function (keys)
     end
 end
 
-add_joker = function (keys)
+add_jokers = function (keys)
     for _, key in ipairs(keys) do
         local joker = create_card('Joker', G.jokers, nil, nil, nil, nil, key)
         joker:add_to_deck()
         G.jokers:emplace(joker)
     end
+end
+
+--- SYNERGY STUFF
+
+local synergies = {
+    {required = {"j_scary_face", "j_smiley"}, spawn = "j_mltro_syn_yaoi"}, -- Fixed: added j_ prefix
+    {required = {"j_rough_gem", "j_bloodstone", "j_arrowhead", "j_onyx_agate"}, spawn = "j_mltro_syn_geology"},
+    {required = joker_categories.food, spawn = "j_mltro_syn_refrigerator", n_required = 3},
+    {required = {"j_popcorn", "j_hack"}, spawn = "j_mltro_syn_joker_the_movie"},
+}
+
+--- Old check_synergy
+-- check_synergy = function (check_keys, spawn_keys)
+--     local jokers = G.jokers.cards
+--     local n_found = 0
+--     for i = #jokers, 1, -1 do
+--         local joker = jokers[i]
+--         local current_key = joker.config.center.key
+--         for _, v in pairs(check_keys) do
+--             if v == current_key then
+--                 n_found = n_found + 1
+--                 joker:start_dissolve()
+--             end
+--         end
+--     end
+--     if n_found >= #check_keys then
+--         return true
+--     else
+--         return false
+--     end
+-- end
+
+local log = function (message, go)
+    go = go or true
+    if LOGGING_ENABLED and go then
+        print("[MLTRO_DEBUG] "..message)
+    end
+end
+
+check_synergy = function (required_keys, spawn_key, n_required, LOGGING)
+    LOGGING = LOGGING or LOGGING_ENABLED
+    if not n_required then
+        n_required = #required_keys -- Default to requiring all jokers 
+    end
+    log("Starting 'check_synergy' routine with "..n_required.." required jokers", LOGGING)
+    log("  > Check spawn conditions for '"..spawn_key.."'", LOGGING)
+    local jokers = G.jokers.cards
+    log("  > Current jokers:", LOGGING)
+    for i, joker in ipairs(jokers) do
+        log("    > ["..i.."] '"..joker.config.center.key.."'", LOGGING)
+    end
+    local found_jokers = {}
+    local copied_required_keys = {}
+    log("  > Copying table 'required_keys' into 'copied_required_keys'...", LOGGING)
+    for i, v in ipairs(required_keys) do
+        copied_required_keys[i] = v
+        log("    > Copied '"..v.."' into index "..i.." of table 'copied_required_keys'", LOGGING)
+    end
+    
+    -- Find all required jokers
+    for i = #jokers, 1, -1 do
+        local joker = jokers[i]
+        local current_key = joker.config.center.key
+        log("  > Entering loop to check '"..current_key.."' against table 'required_keys'", LOGGING)
+        
+        for req_index, required_key in ipairs(copied_required_keys) do
+            if required_key == current_key then
+                log("    > Found '"..current_key.."'!", LOGGING)
+                log("    > Adding '"..current_key.."' to table 'found_jokers'", LOGGING)
+                table.insert(found_jokers, joker)
+                log("    > Removing '"..copied_required_keys[req_index].."' from table 'copied_required_keys'", LOGGING)
+                -- copied_required_keys[req_index] = nil
+                table.remove(copied_required_keys, req_index)
+                log(" [!]> Breaking loop [main.lua; line 131]", LOGGING)
+                break
+            else
+                log("    > '"..current_key.."' is NOT '"..required_key.."', continuing", LOGGING)
+            end
+        end
+    end
+    
+    -- Check if we found enough jokers
+    if #found_jokers >= n_required then
+        log("  > Found enough ("..n_required..") jokers!", LOGGING)
+        log("  > Starting dissolve on all jokers...", LOGGING)
+        -- Dissolve the found jokers
+        for _, joker in pairs(found_jokers) do
+            joker:start_dissolve()
+            log("    > Dissolved "..joker.config.center.key, LOGGING)
+        end
+        
+        -- Spawn the new synergy joker
+        if spawn_key then
+            log("  > Spanwing '"..spawn_key.."'", LOGGING)
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.3,
+                func = function()
+                    -- Check if the joker key exists before trying to create it
+                    if not G.P_CENTERS[spawn_key] then
+                        error("ERROR: Synergy joker key '" .. spawn_key .. "' not found!")
+                        return true
+                    end
+                    
+                    local new_joker = create_card('Joker', G.jokers, nil, nil, nil, nil, spawn_key)
+                    new_joker:add_to_deck()
+                    G.jokers:emplace(new_joker)
+                    
+                    -- Show synergy message
+                    card_eval_status_text(new_joker, 'extra', nil, nil, nil, {
+                        message = "Synergy!",
+                        colour = G.C.DARK_EDITION
+                    })
+                    play_sound('card1')
+                    play_sound('polychrome1')
+                    return true
+                end
+            }))
+        end
+        
+        return true
+    else
+        log("[!] Did not find enough jokers!", LOGGING)
+        return false
+    end
+end
+
+-- Function to check all synergies
+local function check_all_synergies()
+    for _, synergy in pairs(synergies) do
+        check_synergy(synergy.required, synergy.spawn, synergy.n_required, false)
+    end
+end
+
+-- Hook into the Card:add_to_deck function to trigger synergy checks
+local card_add_to_deck = Card.add_to_deck
+function Card:add_to_deck(from_debuff)
+    local ret = card_add_to_deck(self, from_debuff)
+    
+    -- Only check synergies when a joker is added (not from debuff effects)
+    if not from_debuff and self.ability and self.ability.set == 'Joker' then
+        -- Delay the synergy check slightly to ensure the card is fully added
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.1,
+            func = function()
+                check_all_synergies()
+                return true
+            end
+        }))
+    end
+    
+    return ret
+end
+
+-- Alternative/Additional: Hook into shop purchase events
+-- This ensures synergies trigger when buying jokers from the shop
+local card_buy_and_use = Card.buy_and_use
+function Card:buy_and_use(area, skip_animation)
+    local ret = card_buy_and_use(self, area, skip_animation)
+    
+    -- Check synergies after buying a joker
+    if self.ability and self.ability.set == 'Joker' then
+        G.E_MANAGER:add_event(Event({
+            trigger = 'after',
+            delay = 0.2,
+            func = function()
+                check_all_synergies()
+                return true
+            end
+        }))
+    end
+
+    for k, v in pairs(G.P_CENTERS) do
+        if string.find(k, "yaoi") then
+            print("Found yaoi joker: " .. k)
+        end
+    end
+    
+    return ret
+end
+
+-- Optional: Also check synergies at the start of each round
+-- This catches any edge cases or synergies that might have been missed
+local game_start_run = Game.start_run
+function Game:start_run(args)
+    local ret = game_start_run(self, args)
+    
+    -- Check synergies at the start of each run
+    G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 1.0,
+        func = function()
+            check_all_synergies()
+            return true
+        end
+    }))
+    
+    return ret
 end
 
 --- ATLASES
@@ -118,6 +310,10 @@ SMODS.Sound {
     key = "mj_downgrade",
     path = "mj_downgrade.wav"
 }
+SMODS.Sound {
+    key = "fart",
+    path = "long-brain-fart.wav"
+}
 --- JOKERS
 -- planets_vro
 SMODS.Joker {
@@ -145,6 +341,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
     
     -- Function that triggers when blind is selected
@@ -232,6 +429,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -349,6 +547,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calc_dollar_bonus = function(self, card)
@@ -396,6 +595,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -456,6 +656,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -494,6 +695,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -549,6 +751,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     add_to_deck = function(self, card, from_debuff)
@@ -608,6 +811,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -654,6 +858,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -707,6 +912,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function(self, card, context)
@@ -763,6 +969,7 @@ SMODS.Joker {
 
     in_pool = function(self)
         allow_duplicates = false
+        return true
     end,
 
     calculate = function (self, card, context)
@@ -936,6 +1143,39 @@ SMODS.Joker {
     end
 }
 
+-- brown card
+SMODS.Joker {
+    key = "brown_card",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    atlas = "Jokers",
+    pos = { x = 3, y = 3 },
+    loc_txt = {
+        name = "Brown Card",
+        text = {
+            ""
+        }
+    },
+
+    in_pool = function(self)
+        allow_duplicates = false
+        return true
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            play_sound("mltro_fart")
+            return {
+                message = "i farded",
+                card = card
+            }
+        end
+    end,
+}
+
 --- SYNERGY JOKERS
 -- Yaoi
 SMODS.Joker {
@@ -943,30 +1183,191 @@ SMODS.Joker {
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
-    rarity = 1,
+    rarity = 4, 
     cost = 0,
-    config = {},
+    config = {
+        extra = {
+            mult = 10,
+            chips = 60
+        }
+    },
     atlas = "Jokers",
     pos = { x = 2, y = 3 },
     loc_txt = {
         name = "Yaoi",
         text = {
-            "gay men"
+            "{C:attention,E:1}hot men kissing{}",
+            "Played {C:attention}face{} cards give {C:mult}+#1#{} Mult and",
+            "{C:chips}+#2#{} Chips when scored"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.mult, card.ability.extra.chips } }
+    end,
+
+    in_pool = function(self)
+        return false -- Synergy jokers shouldn't appear in normal pools
+    end,
+
+    calculate = function (self, card, context)
+        if context.individual and context.cardarea == G.play and context.other_card:is_face() then
+            return {
+                mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips
+            }
+        end
+    end,
+
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    end
+}
+
+-- Geology
+SMODS.Joker {
+    key = "syn_geology",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 4, 
+    cost = 0,
+    config = {
+        extra = {
+            mult = 7,
+            chips = 50,
+            xmult = 1.5,
+            dollars = 1,
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 1, y = 4 },
+    loc_txt = {
+        name = "Geology",
+        text = {
+            "Every scored card has a",
+            "{C:green}1 in 1 chance{} to give:",
+            "{C:mult}+#1#{} Mult",
+            "{C:chips}+#2#{} Chips",
+            "{X:mult,C:white}x#3#{} Mult",
+            "and {C:money}$#4#{}"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.mult,
+            card.ability.extra.chips,
+            card.ability.extra.xmult,
+            card.ability.extra.dollars
+        } }
+    end,
+
+    in_pool = function(self)
+        return false -- Synergy jokers shouldn't appear in normal pools
+    end,
+
+    calculate = function (self, card, context)
+        if context.individual and context.cardarea == G.play then
+            return {
+                mult = card.ability.extra.mult,
+                chips = card.ability.extra.chips,
+                dollars = card.ability.extra.dollars,
+                xmult = card.ability.extra.xmult
+            }
+        end
+    end,
+
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    end
+}
+
+-- Refrigerator
+SMODS.Joker {
+    key = "syn_refrigerator",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 4, 
+    cost = 0,
+    config = {
+        extra = {
+            mult = 7,
+            chips = 50,
+            xmult = 1.5,
+            dollars = 1,
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 0, y = 4 },
+    loc_txt = {
+        name = "Refrigerator",
+        text = {
+            "At the {C:attention}beginning{} of a round,",
+            "spawns a random {C:attention}Food Joker{}",
+            "{C:inactives:0.8}(Turtle Bean, Popcorn, etc.){}"
         }
     },
 
     in_pool = function(self)
-        allow_duplicates = false
+        return false -- Synergy jokers shouldn't appear in normal pools
     end,
 
     calculate = function (self, card, context)
-        if context.before and not context.blueprint then
-            check_synergy({"j_scary_face", "j_smiley"})
+        if context.setting_blind then
+            add_jokers({joker_categories.food[math.random(1, #joker_categories.food)]})
+            return {
+                message = "Yummy!",
+                card = card
+            }
         end
     end,
 
-    set_badges = function (self, card, badges)
-        badges[#badges+1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    end
+}
+
+-- "Joker: The Movie"
+SMODS.Joker {
+    key = "syn_joker_the_movie",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 4, 
+    cost = 0,
+    config = {
+        extra = {
+            mult = 7,
+            chips = 50,
+            xmult = 1.5,
+            dollars = 1,
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 2, y = 4 },
+    loc_txt = {
+        name = "\"Joker: The Movie\"",
+        text = {
+            "oeepeepoopoo"
+        }
+    },
+
+    in_pool = function(self)
+        return false -- Synergy jokers shouldn't appear in normal pools
+    end,
+
+    calculate = function (self, card, context)
+        if context.setting_blind then
+            add_jokers({joker_categories.food[math.random(1, #joker_categories.food)]})
+            return {
+                message = "Yummy!",
+                card = card
+            }
+        end
+    end,
+
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
     end
 }
 
