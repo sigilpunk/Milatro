@@ -18,20 +18,26 @@
 ---     - Yaoi: Scary Face + Smiling Face = x2 joker abilities | DONE!
 ---     - Geology: Rough Gem + Bloodstone + Arrowhead + Onyx Agate = 100% chance $1, X1.5 mult, +50 chips, +7 mult | DONE
 ---     - Refrigerator: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots | DONE
----     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank
+---     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank | DONE!
+---     - Pallete: Red Card + Yellow Card + Blue Card = Gives $2, +5 chips, +5 mult per booster pack skipped
+---     - yea, ur hacking buddy: All Legendary jokers = sets base chips to 0 after all scoring and jokers
+---     - Beelzebub: All suit jokers = +6 mult on every card (Art: all four jokers in quadrents)
 --- 
 --- Joker ideas:
 ---     - Bodyguard: Disables a boss blind, takes $10 when disabling a boss blind
 ---     - Riff Raff but awesome: spawns one random Milatro joker then fucking dies
 ---     - Tritanopia: Cards give the same amount of mult as they do chips
----     - Sanctified Sword: Destroys every joker to the left, 
+---     - Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds its sell value to this mult 
 
 --- HELPER FUNCTIONS AND DEFINITIONS
 
 LOGGING_ENABLED = false
 
 joker_categories = {
-    food = {"j_egg", "j_ice_cream", "j_cavendish", "j_turtle_bean", "j_diet_cola", "j_popcorn", "j_ramen", "j_selzer", "j_gros_michel", "j_mltro_yo_gurt", "j_mltro_applebees"}
+    food = {"j_egg", "j_ice_cream", "j_cavendish", "j_turtle_bean", "j_diet_cola", "j_popcorn", "j_ramen", "j_selzer", "j_gros_michel", "j_mltro_yo_gurt", "j_mltro_applebees"},
+    legendary = {"j_perkeo", "j_chicot", "j_yorick", "j_triboulet", "j_canio"},
+    suit = {"j_greedy_joker", "j_lusty_joker", "j_wrathful_joker", "j_gluttenous_joker"},
+    colors = {"j_red_card", "j_mltro_blue_card", "j_mltro_yellow_card"}
 }
 
 check_jokers = function (keys)
@@ -1337,10 +1343,8 @@ SMODS.Joker {
     cost = 0,
     config = {
         extra = {
-            mult = 7,
-            chips = 50,
-            xmult = 1.5,
-            dollars = 1,
+            mult = 15,
+            valid_ranks = {2, 3, 4, 5}
         }
     },
     atlas = "Jokers",
@@ -1348,21 +1352,31 @@ SMODS.Joker {
     loc_txt = {
         name = "\"Joker: The Movie\"",
         text = {
-            "oeepeepoopoo"
+            "Retrigger each played {C:attention}2{}, {C:attention}3{}, {C:attention}4{}, or {C:attention}5{}.",
+            "Each {C:attention}retriggered{} card gives {C:mult}+#1#{} Mult"
         }
     },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.mult, card.ability.extra.chips } }
+    end,
 
     in_pool = function(self)
         return false -- Synergy jokers shouldn't appear in normal pools
     end,
 
     calculate = function (self, card, context)
-        if context.setting_blind then
-            add_jokers({joker_categories.food[math.random(1, #joker_categories.food)]})
-            return {
-                message = "Yummy!",
-                card = card
-            }
+        if context.individual and context.cardarea == G.play then
+            for _, scored_card in ipairs(context.scoring_hand) do
+                for _, valid_id in ipairs(card.ability.extra.valid_ranks) do
+                    if scored_card:get_id() == valid_id then
+                        return {
+                            card = card,
+                            mult = card.ability.extra.mult,
+                            repetitions = 2
+                        }
+                    end
+                end
+            end
         end
     end,
 
