@@ -74,6 +74,9 @@ local synergies = {
     {required = {"j_rough_gem", "j_bloodstone", "j_arrowhead", "j_onyx_agate"}, spawn = "j_mltro_syn_geology"},
     {required = joker_categories.food, spawn = "j_mltro_syn_refrigerator", n_required = 3},
     {required = {"j_popcorn", "j_hack"}, spawn = "j_mltro_syn_joker_the_movie"},
+    {required = joker_categories.colors, spawn = "j_mltro_syn_pallete"},
+    {required = joker_categories.legendary, spawn = "j_mltro_syn_ur_hacking"},
+    {required = joker_categories.suit, spawn = "j_mltro_beelzebub"}
 }
 
 --- Old check_synergy
@@ -1178,6 +1181,55 @@ SMODS.Joker {
                 message = "i farded",
                 card = card
             }
+        end
+    end,
+}
+
+-- bodygaurd
+SMODS.Joker {
+    key = "bodyguard",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 2,
+    cost = 5,
+    config = {
+        extra = {
+            bodyguard_fee = -10
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 3, y = 4 },
+    loc_txt = {
+        name = "Bodyguard",
+        text = {
+            "{C:attention}Disables{} the current {C:attention}Boss Blind{}'s ability",
+            "When triggered, takes {C:money}$#1#{}"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.bodyguard_fee
+        } }
+    end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+        return true
+    end,
+
+    calculate = function(self, card, context)
+        if context.setting_blind then
+            if G.GAME.blind and not G.GAME.blind.disabled and G.GAME.blind.boss then
+                return {
+                    message = "Hold It!",
+                    dollars = card.ability.extra.bodyguard_fee,
+                    colour = G.C.PURPLE,
+                    func = function ()
+                        G.GAME.blind:disable()
+                    end
+                }
+            end
         end
     end,
 }
