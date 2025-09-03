@@ -10,23 +10,20 @@
 
 
 --- TODO:
---- Create Spectral Card for Starman Seal
---- Create Planet Card for Four Of A Four
---- Create Cash toker (synergy with raised fist: raise lowest card in hand by one rank)
+--- [!] Create Spectral Card for Starman Seal
+--- [!] Create Planet Card for Four Of A Four
+--- 
 --- Joker Synergies: create new joker when certain jokers are obtained, destroys synergized jokers
 ---     - balatro
----     - Yaoi: Scary Face + Smiling Face = x2 joker abilities | DONE!
----     - Geology: Rough Gem + Bloodstone + Arrowhead + Onyx Agate = 100% chance $1, X1.5 mult, +50 chips, +7 mult | DONE
----     - Refrigerator: yo gurt + Gros Michael (or Cavendish) + Popcorn + Ramen + Diet Cola + Turtle Bean (5 of any) = 1 random food joker every hand played, ignores joker slots | DONE
----     - "Joker: The Movie": Popcorn + Hack = hack but more retriggers and higher rank | DONE!
 ---     - Pallete: Red Card + Yellow Card + Blue Card = Gives $2, +5 chips, +5 mult per booster pack skipped
 ---     - yea, ur hacking buddy: All Legendary jokers = sets base chips to 0 after all scoring and jokers
 ---     - Beelzebub: All suit jokers = +6 mult on every card (Art: all four jokers in quadrents)
+---     - Dictatorship of the Proletariat: Every Boss Blind, all cards ranks are mirrored (A <-> 2, K <-> 3, Q <-> 4, etc.)
 --- 
---- Joker ideas:
----     - Bodyguard: Disables a boss blind, takes $10 when disabling a boss blind
+--- Joker Ideas:
 ---     - Riff Raff but awesome: spawns one random Milatro joker then fucking dies
 ---     - Tritanopia: Cards give the same amount of mult as they do chips
+---     - Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
 ---     - Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds its sell value to this mult 
 
 --- HELPER FUNCTIONS AND DEFINITIONS
