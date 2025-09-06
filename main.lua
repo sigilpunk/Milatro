@@ -18,7 +18,7 @@
 ---     - Pallete: Red Card + Yellow Card + Blue Card = Gives $2, +5 chips, +5 mult per booster pack skipped
 ---     - yea, ur hacking buddy: All Legendary jokers = sets base chips to 0 after all scoring and jokers
 ---     - Beelzebub: All suit jokers = +6 mult on every card (Art: all four jokers in quadrents)
----     - Dictatorship of the Proletariat: Every Boss Blind, all cards ranks are mirrored (A <-> 2, K <-> 3, Q <-> 4, etc.)
+---     - Dictatorship of the Proletariat: Revolutionary, Raised Fist: Every Boss Blind, all cards ranks are mirrored (A <-> 2, K <-> 3, Q <-> 4, etc.)
 --- 
 --- Joker Ideas:
 ---     - Riff Raff but awesome: spawns one random Milatro joker then fucking dies
@@ -73,7 +73,8 @@ local synergies = {
     {required = {"j_popcorn", "j_hack"}, spawn = "j_mltro_syn_joker_the_movie"},
     {required = joker_categories.colors, spawn = "j_mltro_syn_pallete"},
     {required = joker_categories.legendary, spawn = "j_mltro_syn_ur_hacking"},
-    {required = joker_categories.suit, spawn = "j_mltro_beelzebub"}
+    {required = joker_categories.suit, spawn = "j_mltro_syn_beelzebub"},
+    {required = {"j_mltro_revolutionary", "j_raised_fist"}, spawn="j_mltro_syn_proletariat"}
 }
 
 --- Old check_synergy
@@ -300,6 +301,7 @@ SMODS.Atlas {
     py = 95,
 }
 
+--- SOUNDS
 SMODS.Sound {
     key = "friendyoumilo",
     path = "friendyoumilo.wav"
@@ -320,6 +322,7 @@ SMODS.Sound {
     key = "fart",
     path = "long-brain-fart.wav"
 }
+
 --- JOKERS
 -- planets_vro
 SMODS.Joker {
@@ -1117,7 +1120,7 @@ SMODS.Joker {
     end
 }
 
- -- fuck you joker
+-- fuck you joker
 SMODS.Joker {
     key = "fuck_you",
     blueprint_compat = true,
