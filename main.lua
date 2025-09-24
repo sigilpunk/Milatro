@@ -31,10 +31,52 @@
 LOGGING_ENABLED = false
 
 joker_categories = {
-    food = {"j_egg", "j_ice_cream", "j_cavendish", "j_turtle_bean", "j_diet_cola", "j_popcorn", "j_ramen", "j_selzer", "j_gros_michel", "j_mltro_yo_gurt", "j_mltro_applebees"},
-    legendary = {"j_perkeo", "j_chicot", "j_yorick", "j_triboulet", "j_canio"},
-    suit = {"j_greedy_joker", "j_lusty_joker", "j_wrathful_joker", "j_gluttenous_joker"},
-    colors = {"j_red_card", "j_mltro_blue_card", "j_mltro_yellow_card"}
+    food = {
+        "j_egg", 
+        "j_ice_cream", 
+        "j_cavendish", 
+        "j_turtle_bean", 
+        "j_diet_cola", 
+        "j_popcorn", 
+        "j_ramen", 
+        "j_selzer", 
+        "j_gros_michel", 
+        "j_mltro_yo_gurt"
+    },
+    legendary = {
+        "j_perkeo", 
+        "j_chicot", 
+        "j_yorick", 
+        "j_triboulet", 
+        "j_canio"},
+    suit = {
+        "j_greedy_joker", 
+        "j_lusty_joker", 
+        "j_wrathful_joker", 
+        "j_gluttenous_joker"},
+    colors = {
+        "j_red_card", 
+        "j_mltro_blue_card", 
+        "j_mltro_yellow_card"
+    },
+    milatro_base = {
+        "j_mltro_planets_vro",
+        "j_mltro_ceoofidiot",
+        "j_mltro_jobapp",
+        "j_mltro_driver",
+        "j_mltro_marcelium",
+        "j_mltro_fresh_lemon",
+        "j_mltro_applebees",
+        "j_mltro_blue_card",
+        "j_mltro_yellow_card",
+        "j_mltro_yo_gurt",
+        "j_mltro_spilled_ink",
+        "j_mltro_the_deal",
+        "j_mltro_teague_westra",
+        "j_mltro_fuck_you",
+        "j_mltro_brown_card",
+        "j_mltro_bodyguard"
+    }
 }
 
 check_jokers = function (keys)
@@ -1228,6 +1270,58 @@ SMODS.Joker {
                     func = function ()
                         G.GAME.blind:disable()
                     end
+                }
+            end
+        end
+    end,
+}
+
+SMODS.Joker {
+    key = "awesome_riff_raff",
+    blueprint_compat = true,
+    perishable_compat = false,
+    discovered = false,
+    rarity = 2,
+    cost = 6,
+    config = {
+        extra = {
+            creates = 1
+        }
+    },
+    atlas = "Jokers",
+    pos = { x = 0, y = 5 },
+    loc_txt = {
+        name = "Riff Raff but awesome",
+        text = {
+            "When {C:attention}Blind{} is selected,",
+            "Creates #1# {X:dark_edition,C:white}Milatro{} joker then {V:1}fucking dies{}",
+            "{C:inactive}(must have room){}"
+        }
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.creates,
+            colours = { HEX("aa2220")}
+        } }
+    end,
+
+    in_pool = function(self)
+        allow_duplicates = false
+        return true
+    end,
+
+    calculate = function(self, card, context)
+        if context.setting_blind and #G.jokers.cards + G.GAME.joker_buffer < G.jokers.config.card_limit then
+            local jokers_to_create = math.min(card.ability.extra.creates,
+                G.jokers.config.card_limit - (#G.jokers.cards + G.GAME.joker_buffer))
+            G.GAME.joker_buffer = G.GAME.joker_buffer + jokers_to_create
+            if jokers_to_create > 0 then
+                add_jokers({joker_categories.milatro_base[math.random(1, #joker_categories.milatro_base)]})
+                G.GAME.joker_buffer = 0
+                SMODS.destroy_cards(card, nil, nil, true)
+                return {
+                    message = "see ya loser",
+                    colour = G.C.DARK_EDITION
                 }
             end
         end
