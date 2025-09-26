@@ -21,15 +21,17 @@
 ---     - Dictatorship of the Proletariat: Revolutionary, Raised Fist: Every Boss Blind, all cards ranks are mirrored (A <-> 2, K <-> 3, Q <-> 4, etc.)
 --- 
 --- Joker Ideas:
----     - Riff Raff but awesome: spawns one random Milatro joker then fucking dies
----     - Tritanopia: Cards give the same amount of mult as they do chips
----     - Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
----     - Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds its sell value to this mult 
+---     - DONE | Riff Raff but awesome: spawns one random Milatro joker then fucking dies
+---     - DONE | Tritanopia: Cards give the same amount of mult as they do chips
+---     - DONE | Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
+---     - Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds double its sell value to this mult 
 
 --- HELPER FUNCTIONS AND DEFINITIONS
 
-LOGGING_ENABLED = false
+LOGGING_ENABLED = true
+SYNERGY_LOGGING_ENABLED = false
 
+-- joker_categories
 joker_categories = {
     food = {
         "j_egg", 
@@ -79,6 +81,7 @@ joker_categories = {
     }
 }
 
+-- check_jokers
 check_jokers = function (keys)
     local jokers = G.jokers.cards
     local n_found = 0
@@ -98,6 +101,7 @@ check_jokers = function (keys)
     end
 end
 
+-- add_jokers
 add_jokers = function (keys)
     for _, key in ipairs(keys) do
         local joker = create_card('Joker', G.jokers, nil, nil, nil, nil, key)
@@ -107,7 +111,7 @@ add_jokers = function (keys)
 end
 
 --- SYNERGY STUFF
-
+-- synergies
 local synergies = {
     {required = {"j_scary_face", "j_smiley"}, spawn = "j_mltro_syn_yaoi"}, -- Fixed: added j_ prefix
     {required = {"j_rough_gem", "j_bloodstone", "j_arrowhead", "j_onyx_agate"}, spawn = "j_mltro_syn_geology"},
@@ -140,15 +144,48 @@ local synergies = {
 --     end
 -- end
 
-local log = function (message, go)
-    go = go or true
-    if LOGGING_ENABLED and go then
+-- log
+local log = function (message, enabled)
+    if LOGGING_ENABLED and enabled then
         print("[MLTRO_DEBUG] "..message)
     end
 end
 
+-- stringify_table
+__stringify_depth = 0
+stringify_table = function (table, depth_limit, depth)
+    depth = depth or 0
+    depth_limit = depth_limit or 1
+    local s = "{"
+    for k,v in pairs(table) do
+        s = s.."\t"
+        if type(v) == "table" and depth < depth_limit then
+            v = stringify_table(v, depth_limit, __stringify_depth)
+            __stringify_depth = __stringify_depth + 1
+        elseif type(v) == "table" and depth >= depth_limit then
+            v = tostring(v)
+            __stringify_depth = 0
+        end
+        v = tostring(v)
+        s = s.."\n".."\""..k.."\""..": "..v..","
+    end
+    local final_string = s.."}"
+    if depth > 0 then
+        final_string = final_string..","
+    end
+    return final_string
+end
+
+-- print_table
+local print_table = function (table, depth_limit)
+    print(stringify_table(table, depth_limit))
+end
+
+-- check_synergy
 check_synergy = function (required_keys, spawn_key, n_required, LOGGING)
-    LOGGING = LOGGING or LOGGING_ENABLED
+    -- LOGGING = LOGGING or LOGGING_ENABLED
+    -- LOGGING = LOGGING or (SYNERGY_LOGGING_ENABLED and LOGGING_ENABLED)
+    local LOGGING = false
     if not n_required then
         n_required = #required_keys -- Default to requiring all jokers 
     end
@@ -235,14 +272,14 @@ check_synergy = function (required_keys, spawn_key, n_required, LOGGING)
     end
 end
 
--- Function to check all synergies
+-- check_all_synergies
 local function check_all_synergies()
     for _, synergy in pairs(synergies) do
         check_synergy(synergy.required, synergy.spawn, synergy.n_required, false)
     end
 end
 
--- Hook into the Card:add_to_deck function to trigger synergy checks
+-- Card:add_to_deck hook
 local card_add_to_deck = Card.add_to_deck
 function Card:add_to_deck(from_debuff)
     local ret = card_add_to_deck(self, from_debuff)
@@ -263,8 +300,7 @@ function Card:add_to_deck(from_debuff)
     return ret
 end
 
--- Alternative/Additional: Hook into shop purchase events
--- This ensures synergies trigger when buying jokers from the shop
+-- Card:buy_and_use hook
 local card_buy_and_use = Card.buy_and_use
 function Card:buy_and_use(area, skip_animation)
     local ret = card_buy_and_use(self, area, skip_animation)
@@ -290,8 +326,7 @@ function Card:buy_and_use(area, skip_animation)
     return ret
 end
 
--- Optional: Also check synergies at the start of each round
--- This catches any edge cases or synergies that might have been missed
+-- Game:start_run hook
 local game_start_run = Game.start_run
 function Game:start_run(args)
     local ret = game_start_run(self, args)
@@ -366,7 +401,7 @@ SMODS.Sound {
 }
 
 --- JOKERS
--- planets_vro
+-- planets vro 🥀
 SMODS.Joker {
     key = "planets_vro",
     loc_txt = {
@@ -432,7 +467,7 @@ SMODS.Joker {
     end
 }
 
--- CEO of Idiot
+-- CEO Of Idiot
 SMODS.Joker {
     key = "ceoofidiot",
     loc_txt = {
@@ -834,7 +869,7 @@ SMODS.Joker {
     end
 }
 
--- blue card
+-- Blue Card
 SMODS.Joker {
     key = "blue_card",
     blueprint_compat = true,
@@ -881,7 +916,7 @@ SMODS.Joker {
     end,
 }
 
--- yellow card
+-- Yellow Card
 SMODS.Joker {
     key = "yellow_card",
     blueprint_compat = true,
@@ -998,7 +1033,7 @@ SMODS.Joker {
     end
 }
 
--- spilled ink
+-- Spilled Ink
 -- Turns your played hand into spades
 SMODS.Joker {
     key = "spilled_ink",
@@ -1076,7 +1111,7 @@ SMODS.Joker {
     end
 }
 
--- the deal
+-- The Deal
 -- howie mandel
 SMODS.Joker {
     key = "the_deal",
@@ -1162,7 +1197,7 @@ SMODS.Joker {
     end
 }
 
--- fuck you joker
+-- i fucking hate you and im going to kill you
 SMODS.Joker {
     key = "fuck_you",
     blueprint_compat = true,
@@ -1194,7 +1229,7 @@ SMODS.Joker {
     end
 }
 
--- brown card
+-- Brown Card
 SMODS.Joker {
     key = "brown_card",
     blueprint_compat = true,
@@ -1206,9 +1241,7 @@ SMODS.Joker {
     pos = { x = 3, y = 3 },
     loc_txt = {
         name = "Brown Card",
-        text = {
-            ""
-        }
+        text = {""}
     },
 
     in_pool = function(self)
@@ -1227,7 +1260,7 @@ SMODS.Joker {
     end,
 }
 
--- bodygaurd
+-- Bodyguard
 SMODS.Joker {
     key = "bodyguard",
     blueprint_compat = true,
@@ -1276,13 +1309,14 @@ SMODS.Joker {
     end,
 }
 
+-- Riff Raff but awesome
 SMODS.Joker {
     key = "awesome_riff_raff",
     blueprint_compat = true,
     perishable_compat = false,
     discovered = false,
-    rarity = 2,
-    cost = 6,
+    rarity = 1,
+    cost = 0,
     config = {
         extra = {
             creates = 1
@@ -1326,6 +1360,138 @@ SMODS.Joker {
             end
         end
     end,
+}
+
+-- Colorblind
+SMODS.Joker {
+    key = "colorblind",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 2,
+    cost = 6,
+    atlas = "Jokers",
+    pos = {x = 1, y = 5},
+    loc_txt = {
+        name = "Colorblind",
+        text = {
+            "Scored cards give as much",
+            "{C:mult}Mult{} as they do {C:chips}Chips{}"
+        }
+    },
+
+    in_pool = function(self)
+        return true
+    end,
+
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.play and not context.end_of_round then
+            -- print_table(context.other_card.base)
+            return {
+                mult = context.other_card:get_chip_bonus()
+            }
+        end
+    end
+}
+
+-- Revolutionary
+SMODS.Joker {
+    key = "revolutionary",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    atlas = "Jokers",
+    pos = { x = 2, y = 5 },
+    config = { extra = {
+        raise_by = 1
+    }
+    },
+
+    loc_vars = function (self, info_queue, card)
+        return  {
+            vars = {
+                card.ability.extra.raise_by
+            }
+        }
+    end,
+
+    loc_txt = {
+        name = "Revolutionary",
+        text = {
+            "Raises the rank of {C:attention}lowest{}",
+            "ranked card held in hand by {C:attention}#1#{}"
+        }
+    },
+
+    in_pool = function(self)
+        return true
+    end,
+
+    calculate = function(self, card, context)
+        if context.individual and context.cardarea == G.hand and not context.end_of_round then
+            local temp_ID = 15
+            local raised_card = nil
+            for i = 1, #G.hand.cards do
+                if temp_ID >= G.hand.cards[i].base.id and not SMODS.has_no_rank(G.hand.cards[i]) then
+                    temp_ID = G.hand.cards[i].base.id
+                    raised_card = G.hand.cards[i]
+                end
+            end
+            if raised_card == context.other_card then
+                if context.other_card.debuff then
+                    return {
+                        message = localize('k_debuffed'),
+                        colour = G.C.RED
+                    }
+                elseif raised_card then
+                    print_table(raised_card.base, 1)
+                    -- raise card
+                    G.E_MANAGER:add_event(Event({
+                        trigger = 'after',
+                        delay = 0.4,
+                        func = function()
+                            play_sound('tarot1')
+                            card:juice_up(0.3, 0.5)
+                            return true
+                        end
+                    }))
+                    local percent = 1.15 - (1 - 0.999) / (#G.hand.highlighted - 0.998) * 0.3
+                    G.E_MANAGER:add_event(Event({
+                        trigger = 'after',
+                        delay = 0.15,
+                        func = function()
+                            raised_card:flip()
+                            play_sound('card1', percent)
+                            raised_card:juice_up(0.3, 0.3)
+                            return true
+                        end
+                    }))
+                    delay(0.2)
+                    G.E_MANAGER:add_event(Event({
+                        trigger = 'after',
+                        delay = 0.1,
+                        func = function()
+                            assert(SMODS.modify_rank(raised_card, card.ability.extra.raise_by))
+                            return true
+                        end
+                    }))
+                    local percent = 0.85 + (1 - 0.999) / (#G.hand.highlighted - 0.998) * 0.3
+                    G.E_MANAGER:add_event(Event({
+                        trigger = 'after',
+                        delay = 0.15,
+                        func = function()
+                            raised_card:flip()
+                            play_sound('tarot2', percent, 0.6)
+                            raised_card:juice_up(0.3, 0.3)
+                            return true
+                        end
+                    }))
+                end
+            end
+        end
+    end
 }
 
 --- SYNERGY JOKERS
@@ -1532,7 +1698,7 @@ SMODS.Joker {
 }
 
 --- TAROTS
--- four tarot
+-- four
 SMODS.Tarot {
     key = "four_tarot",
     set = "Tarot",
