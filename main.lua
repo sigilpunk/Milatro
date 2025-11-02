@@ -6,6 +6,7 @@
 --- PREFIX: mltro
 ----------------------------------------------
 ------------MOD CODE -------------------------
+---
 
 
 
@@ -16,7 +17,7 @@
 --- Joker Synergies: create new joker when certain jokers are obtained, destroys synergized jokers
 ---     - balatro
 ---     - Pallete: Red Card + Yellow Card + Blue Card = Gives $2, +5 chips, +5 mult per booster pack skipped
----     - yea, ur hacking buddy: All Legendary jokers = sets base chips to 0 after all scoring and jokers
+---     - DONE (no art) | yea, ur hacking buddy: All Legendary jokers = sets base chips to 0 after all scoring and jokers
 ---     - Beelzebub: All suit jokers = +6 mult on every card (Art: all four jokers in quadrents)
 ---     - Dictatorship of the Proletariat: Revolutionary, Raised Fist: Every Boss Blind, all cards ranks are mirrored (A <-> 2, K <-> 3, Q <-> 4, etc.)
 --- 
@@ -24,7 +25,7 @@
 ---     - DONE | Riff Raff but awesome: spawns one random Milatro joker then fucking dies
 ---     - DONE | Tritanopia: Cards give the same amount of mult as they do chips
 ---     - DONE | Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
----     - Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds double its sell value to this mult 
+---     - DONE (no art) | Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds its sell value to this mult 
 
 --- HELPER FUNCTIONS AND DEFINITIONS
 
@@ -50,12 +51,14 @@ joker_categories = {
         "j_chicot", 
         "j_yorick", 
         "j_triboulet", 
-        "j_canio"},
+        "j_caino"
+    },
     suit = {
         "j_greedy_joker", 
         "j_lusty_joker", 
         "j_wrathful_joker", 
-        "j_gluttenous_joker"},
+        "j_gluttenous_joker"
+    },
     colors = {
         "j_red_card", 
         "j_mltro_blue_card", 
@@ -77,7 +80,16 @@ joker_categories = {
         "j_mltro_teague_westra",
         "j_mltro_fuck_you",
         "j_mltro_brown_card",
-        "j_mltro_bodyguard"
+        "j_mltro_bodyguard",
+        "j_mltro_colorblind",
+        "j_mltrp_revolutionary",
+        "j_mltro_sword"
+    },
+    milatro_synergies = {
+        "j_mltro_syn_yaoi",
+        "j_mltro_syn_geology",
+        "j_mltro_syn_refrigerator",
+        "j_mltro_syn_joker_the_movie"
     }
 }
 
@@ -1075,9 +1087,11 @@ SMODS.Joker {
                     trigger = 'after',
                     delay = 0.15,
                     func = function()
-                        context.scoring_hand[i]:flip()
-                        play_sound('card1', percent)
-                        context.scoring_hand[i]:juice_up(0.3, 0.3)
+                        if not context.scoring_hand[i].base.suit == "Spades" then
+                            context.scoring_hand[i]:flip()
+                            play_sound('card1', percent)
+                            context.scoring_hand[i]:juice_up(0.3, 0.3)
+                        end
                         return true
                     end
                 }))
@@ -1088,7 +1102,9 @@ SMODS.Joker {
                     trigger = 'after',
                     delay = 0.1,
                     func = function()
-                        scored_card:change_suit("Spades")
+                        if not scored_card.base.suit == "Spades" then
+                            scored_card:change_suit("Spades")
+                        end
                         return true
                     end
                 }))
@@ -1099,9 +1115,11 @@ SMODS.Joker {
                     trigger = 'after',
                     delay = 0.15,
                     func = function()
-                        context.scoring_hand[i]:flip()
-                        play_sound('tarot2', percent, 0.6)
-                        context.scoring_hand[i]:juice_up(0.3, 0.3)
+                        if not  context.scoring_hand[i].base.suit == "Spades" then
+                            context.scoring_hand[i]:flip()
+                            play_sound('tarot2', percent, 0.6)
+                            context.scoring_hand[i]:juice_up(0.3, 0.3)
+                        end
                         return true
                     end
                 }))
@@ -1394,6 +1412,87 @@ SMODS.Joker {
     end
 }
 
+-- Sanctified Sword
+SMODS.Joker {
+    key = "sword",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 2,
+    cost = 6,
+    atlas = "Jokers",
+    pos = {x = 2, y = 3},
+    config = {
+        extra = {
+            mult = 0
+        }
+    },
+    loc_txt = {
+        name = "Sanctified Sword",
+        text = {
+            "When {C:attention}Bilind{} is selected,",
+            "destroys every Joker to the right and",
+            "permanently add their sell values to this {C:mult}Mult{}",
+            "{C:inactive}(Currently {C:mult}+#1#{} {C:inactive}Mult){}"
+        }
+    },
+
+    in_pool = function(self)
+        return true
+    end,
+
+    loc_vars = function(self, info_queue, card)
+        return { vars = { 
+            card.ability.extra.mult
+        } }
+    end,
+
+    calculate = function(self, card, context)
+        if context.setting_blind and not context.blueprint then
+            -- detect slot #
+            local card_pos = nil
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == card then
+                    card_pos = i
+                    break
+                end
+            end
+            local jokers_to_slice = {}
+            for i = card_pos + 1, #G.jokers.cards, 1 do
+                jokers_to_slice[#jokers_to_slice+1] = G.jokers.cards[i]
+            end
+            if card_pos and jokers_to_slice and not SMODS.is_eternal(G.jokers.cards[card_pos + 1], card) and not G.jokers.cards[card_pos + 1].getting_sliced then
+                local net_mult = 0
+                for _, joker in ipairs(jokers_to_slice) do
+                    joker.getting_sliced = true
+                    G.GAME.joker_buffer = G.GAME.joker_buffer - 1
+                    G.E_MANAGER:add_event(Event({
+                        func = function()
+                            G.GAME.joker_buffer = 0
+                            card.ability.extra.mult = card.ability.extra.mult + joker.sell_cost
+                            net_mult = net_mult + joker.sell_cost
+                            card:juice_up(0.8, 0.8)
+                            joker:start_dissolve({ HEX("57ecab") }, nil, 1.6)
+                            play_sound('slice1', 0.96 + math.random() * 0.08)
+                            return true
+                        end
+                    }))
+                end
+                return {
+                    message = localize { type = 'variable', key = 'a_mult', vars = { net_mult } },
+                    colour = G.C.RED,
+                    no_juice = true
+                }
+            end
+        end
+        if context.joker_main then
+            return {
+                mult = card.ability.extra.mult
+            }
+        end
+    end
+}
+
 -- Revolutionary
 SMODS.Joker {
     key = "revolutionary",
@@ -1439,7 +1538,7 @@ SMODS.Joker {
                     raised_card = G.hand.cards[i]
                 end
             end
-            if raised_card == context.other_card then
+            if raised_card and raised_card == context.other_card and not(raised_card.base.nominal == 11) then
                 if context.other_card.debuff then
                     return {
                         message = localize('k_debuffed'),
@@ -1697,6 +1796,43 @@ SMODS.Joker {
     end
 }
 
+-- yea, ur hacking buddy
+SMODS.Joker {
+    key = "syn_ur_hacking",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 4, 
+    cost = 0,
+    atlas = "Jokers",
+    pos = { x = 2, y = 3 },
+    loc_txt = {
+        name = "yea, ur hacking buddy",
+        text = {
+            "hey what the fuck hey bro fuck you"
+        }
+    },
+
+    in_pool = function(self)
+        return false -- Synergy jokers shouldn't appear in normal pools
+    end,
+
+    calculate = function (self, card, context)
+        if context.joker_main then
+            hand_chips = mod_chips(0)
+            
+            return {
+                message = "fuck you",
+                colour = G.C.CHIPS
+            }
+        end
+    end,
+
+    set_card_type_badge = function (self, card, badges)
+        badges[1] = create_badge("Synergy", G.C.DARK_EDITION, G.C.EDITION, 1)
+    end
+}
+
 --- TAROTS
 -- four
 SMODS.Tarot {
@@ -1788,6 +1924,7 @@ SMODS.Tarot {
         delay(0.5)
     end,
 }
+
 
 --- SEALS
 -- Starman Seal
