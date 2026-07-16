@@ -30,12 +30,11 @@
 ---     - DONE | Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
 ---    -> Milk Carton: food joker, has time limit
 ---             "Drink" button: Start timer
----             +1 mult per second left on the timer (60sec maybe)
-            --- 0-10 seconds remaining: +6 mult (fresh)
+            --- 0-10 seconds: +6 mult (fresh)
             -- 10-30 seconds: +4 mult (good)
             -- 30-50 seconds: +2 mult (aging)
             -- 50-60 seconds: +1 mult (nearly expired)
-            -- 60+ seconds: Dissolves automatically
+            -- 60+ seconds: Spoils, -10 mult
 ---            
 ---             "Spoils" after 30sec? -1 mult per hand played (add badge and show status text)
 ---             if i decide on the spoiling mechanic +2 mult flat or smth idk

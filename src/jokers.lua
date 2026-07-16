@@ -1199,3 +1199,127 @@ SMODS.Joker {
         end
     end
 }
+
+-- Milk Carton
+SMODS.Joker {
+    key = "milk_carton",
+    blueprint_compat = true,
+    perishable_compat = true,
+    discovered = false,
+    rarity = 1,
+    cost = 5,
+    atlas = "Jokers",
+    pos = JOKER_PLACEHOLDER_ART,
+    config = { 
+        extra = {
+            duration = 60,
+            timer = 0,
+            step = 0,
+            mult_mod = 0,
+            current_state = "",
+            current_mult_mod = 0,
+            fresh_mult_mod = 6,
+            good_mult_mod = 4,
+            aging_mult_mod = 2,
+            smelly_mult_mod = 1,
+            spoiled_mult_mod = -10,
+        }
+    },
+
+    loc_vars = function (self, info_queue, card)
+        return  {
+            vars = {
+                card.ability.extra.timer,
+                card.ability.extra.current_state,
+                card.ability.extra.current_mult_mod,
+                colours = {
+                    HEX("5899AD")
+                }
+            }
+        }
+    end,
+
+    loc_txt = {
+        name = "Milk Carton",
+        text = {
+            "{B:1,C:white}#1# seconds remaining{}",
+            "haha"
+        }
+    },
+
+    in_pool = function(self)
+        return true
+    end,
+
+    add_to_deck = function(self, card, from_debuff)
+        if not from_debuff then
+            card.ability.extra.timer = card.ability.extra.duration
+            card.ability.extra.step = card.ability.extra.duration / 4
+        end
+    end,
+
+    update = function(self, card, dt)
+        local new_time = card.ability.extra.timer - dt
+        print(dt)
+        if new_time <= 0 then
+            if card.ability.extra.current_state ~= "Spoiled" then
+                card.ability.extra.current_state = "Spoiled"
+                if card.ability.extra.current_mult_mod > 0 then
+                    card.ability.extra.current_mult_mod = 0
+                end
+            end
+            card.ability.extra.current_mult_mod = card.ability.extra.spoiled_mult_mod
+        else
+            card.ability.extra.timer = new_time
+
+            if     card.ability.extra.timer <= card.ability.extra.duration - (0 * card.ability.extra.step) and card.ability.extra.timer > card.ability.extra.duration - (1 * card.ability.extra.step) then
+                if card.ability.extra.current_state ~= "Fresh" then
+                    card.ability.extra.current_state = "Fresh"
+                    card_eval_status_text(card, "extra", nil, nil, nil, {
+                        message = card.ability.extra.current_state,
+                        colour = G.C.RARITY.Legendary
+                    })
+                    card.ability.extra.current_mult_mod = card.ability.extra.fresh_mult_mod
+                end
+
+            elseif card.ability.extra.timer <= card.ability.extra.duration - (1 * card.ability.extra.step) and card.ability.extra.timer > card.ability.extra.duration - (2 * card.ability.extra.step) then
+                if card.ability.extra.current_state ~= "Good" then
+                    card.ability.extra.current_state = "Good"
+                    card_eval_status_text(card, "extra", nil, nil, nil, {
+                        message = card.ability.extra.current_state,
+                        colour = G.C.RARITY.Legendary
+                    })
+                    card.ability.extra.current_mult_mod = card.ability.extra.good_mult_mod
+                end
+
+            elseif card.ability.extra.timer <= card.ability.extra.duration - (2 * card.ability.extra.step) and card.ability.extra.timer > card.ability.extra.duration - (3 * card.ability.extra.step) then
+                if card.ability.extra.current_state ~= "Aging" then
+                    card.ability.extra.current_state = "Aging"
+                    card_eval_status_text(card, "extra", nil, nil, nil, {
+                        message = card.ability.extra.current_state,
+                        colour = G.C.RARITY.Legendary
+                    })
+                    card.ability.extra.current_mult_mod = card.ability.extra.aging_mult_mod
+                end
+
+            elseif card.ability.extra.timer <= card.ability.extra.duration - (3 * card.ability.extra.step) and card.ability.extra.timer > card.ability.extra.duration - (4 * card.ability.extra.step) then
+                if card.ability.extra.current_state ~= "Smelly" then
+                    card.ability.extra.current_state = "Smelly"
+                    card_eval_status_text(card, "extra", nil, nil, nil, {
+                        message = card.ability.extra.current_state,
+                        colour = G.C.RARITY.Legendary
+                    })
+                    card.ability.extra.current_mult_mod = card.ability.extra.smelly_mult_mod
+                end
+            end
+        end
+    end,
+
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return {
+                mult = card.ability.extra.current_mult_mod
+            }
+        end
+    end
+}

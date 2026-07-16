@@ -4,88 +4,6 @@ LOGGING_ENABLED = false
 SYNERGY_LOGGING_ENABLED = false
 JOKER_PLACEHOLDER_ART = { x = 2, y = 3 }
 
--- joker_categories
-joker_categories = {
-    food = {
-        "j_egg", 
-        "j_ice_cream", 
-        "j_cavendish", 
-        "j_turtle_bean", 
-        "j_diet_cola", 
-        "j_popcorn", 
-        "j_ramen", 
-        "j_selzer", 
-        "j_gros_michel", 
-        "j_mltro_yo_gurt"
-    },
-    legendary = {
-        "j_perkeo", 
-        "j_chicot", 
-        "j_yorick", 
-        "j_triboulet", 
-        "j_caino"
-    },
-    suit = {
-        "j_greedy_joker", 
-        "j_lusty_joker", 
-        "j_wrathful_joker", 
-        "j_gluttenous_joker"
-    },
-    colors = {
-        "j_red_card", 
-        "j_mltro_blue_card", 
-        "j_mltro_yellow_card"
-    },
-    milatro_base = {
-        "j_mltro_planets_vro",
-        "j_mltro_ceoofidiot",
-        "j_mltro_jobapp",
-        "j_mltro_driver",
-        "j_mltro_marcelium",
-        "j_mltro_fresh_lemon",
-        "j_mltro_applebees",
-        "j_mltro_blue_card",
-        "j_mltro_yellow_card",
-        "j_mltro_yo_gurt",
-        "j_mltro_spilled_ink",
-        "j_mltro_the_deal",
-        "j_mltro_teague_westra",
-        "j_mltro_fuck_you",
-        "j_mltro_brown_card",
-        "j_mltro_bodyguard",
-        "j_mltro_colorblind",
-        "j_mltro_revolutionary",
-        "j_mltro_sword",
-        "j_mltro_evil_riffraff"
-    },
-    milatro_synergies = {
-        "j_mltro_syn_yaoi",
-        "j_mltro_syn_geology",
-        "j_mltro_syn_refrigerator",
-        "j_mltro_syn_joker_the_movie",
-        "j_mltro_syn_pallete",
-        "j_mltro_syn_ur_hacking",
-        "j_mltro_syn_beelzebub",
-        "j_mltro_syn_proletariat",
-        "j_mltro_syn_awesome_riffraff",
-    },
-    milatro_dogshit = {
-        "j_mltro_jobapp",
-        "j_mltro_fresh_lemon",
-        "j_mltro_blue_card",
-        "j_mltro_the_deal",
-        "j_mltro_fuck_you",
-        "j_mltro_brown_card",
-        "j_mltro_bodyguard",
-        "j_mltro_revolutionary",
-    },
-    milatro_syn_pack_blacklist={
-        "j_cavendish"
-    },
-    milatro_good = {},
-    milatro_all = {},
-    milatro_syn_pack_pool={}
-}
 local function pseudorandom_joker_choice(pool, seed)
     local key = pseudorandom_element(pool, seed)
     return SMODS.create_card({
@@ -93,7 +11,15 @@ local function pseudorandom_joker_choice(pool, seed)
     })
 end
 
+-- Source - https://stackoverflow.com/q/1758991
+-- Posted by Wookai, modified by community. See post 'Timeline' for change history
+-- Retrieved 2026-03-02, License - CC BY-SA 3.0
 
+function table.removekey(table, key)
+    local element = table[key]
+    table[key] = nil
+    return element
+end
 
 function weighted_choice(weighted_pools)
     local roll = pseudorandom(pseudoseed('mltro_weighted_choice'))
@@ -129,6 +55,62 @@ function table.deepcopy(orig)
     return copy
 end
 
+-- joker_categories
+joker_categories = {
+    food = {
+        "j_egg", 
+        "j_ice_cream", 
+        "j_cavendish", 
+        "j_turtle_bean", 
+        "j_diet_cola", 
+        "j_popcorn", 
+        "j_ramen", 
+        "j_selzer", 
+        "j_gros_michel", 
+        "j_mltro_yo_gurt"
+    },
+    legendary = {
+        "j_perkeo", 
+        "j_chicot", 
+        "j_yorick", 
+        "j_triboulet", 
+        "j_caino"
+    },
+    suit = {
+        "j_greedy_joker", 
+        "j_lusty_joker", 
+        "j_wrathful_joker", 
+        "j_gluttenous_joker"
+    },
+    colors = {
+        "j_red_card", 
+        "j_mltro_blue_card", 
+        "j_mltro_yellow_card"
+    },
+    milatro_base = {
+
+    },
+    milatro_synergies = {
+
+    },
+    milatro_dogshit = {
+        "j_mltro_jobapp",
+        "j_mltro_fresh_lemon",
+        "j_mltro_blue_card",
+        "j_mltro_the_deal",
+        "j_mltro_fuck_you",
+        "j_mltro_brown_card",
+        "j_mltro_bodyguard",
+        "j_mltro_revolutionary",
+    },
+    milatro_syn_pack_blacklist={
+        "j_cavendish"
+    },
+    milatro_good = {},
+    milatro_all = {},
+    milatro_syn_pack_pool={}
+}
+
 
 function table.choice(pool)
     return pseudorandom_element(pool, pseudoseed('mltro_table_choice'))
@@ -148,14 +130,12 @@ function table.extended(a, b)
     return result
 end
 
--- Source - https://stackoverflow.com/q/1758991
--- Posted by Wookai, modified by community. See post 'Timeline' for change history
--- Retrieved 2026-03-02, License - CC BY-SA 3.0
-
-function table.removekey(table, key)
-    local element = table[key]
-    table[key] = nil
-    return element
+for key, joker in pairs(SMODS.Jokers) do
+    if joker.synergy then
+        table.extend(joker_categories.milatro_synergies, {key})
+    else
+        table.extend(joker_categories.milatro_base, {key})
+    end
 end
 
 table.extend(joker_categories.milatro_all, joker_categories.milatro_base)

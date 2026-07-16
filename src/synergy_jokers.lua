@@ -15,6 +15,7 @@ SMODS.Rarity {
 -- Yaoi
 SMODS.Joker {
     key = "syn_yaoi",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -59,6 +60,7 @@ SMODS.Joker {
 -- Geology
 SMODS.Joker {
     key = "syn_geology",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -115,6 +117,7 @@ SMODS.Joker {
 -- Refrigerator
 SMODS.Joker {
     key = "syn_refrigerator",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -159,6 +162,7 @@ SMODS.Joker {
 -- "Joker: The Movie"
 SMODS.Joker {
     key = "syn_joker_the_movie",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -209,6 +213,7 @@ SMODS.Joker {
 -- yea, ur hacking buddy
 SMODS.Joker {
     key = "syn_ur_hacking",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -244,6 +249,7 @@ SMODS.Joker {
 -- Beelzebub
 SMODS.Joker {
     key = "syn_beelzebub",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
@@ -285,6 +291,7 @@ SMODS.Joker {
 -- Awesome Riff-Raff
 SMODS.Joker {
     key = "syn_awesome_riffraff",
+    synergy = true,
     blueprint_compat = false,
     perishable_compat = false,
     discovered = false,
@@ -347,6 +354,7 @@ SMODS.Joker {
 -- Dictatorship of the Proletariat
 SMODS.Joker {
     key = "syn_proletariat",
+    synergy = true,
     blueprint_compat = false,
     perishable_compat = false,
     discovered = false,
@@ -444,6 +452,7 @@ SMODS.Joker {
 -- Pallete
 SMODS.Joker {
     key = "syn_pallete",
+    synergy = true,
     blueprint_compat = true,
     perishable_compat = false,
     discovered = false,

@@ -69,7 +69,7 @@ for _,key in pairs(joker_categories.milatro_syn_pack_pool) do
             }
         )
     elseif nil then
-        local joker = SMODS.Jokers["j_"..key]
+        local joker = SMODS.Jokers[key]
         if joker then
             local old_set_badges = joker.set_badges
             joker.set_badges = function(self, card, badges)
