@@ -31,6 +31,12 @@
 ---    -> Milk Carton: food joker, has time limit
 ---             "Drink" button: Start timer
 ---             +1 mult per second left on the timer (60sec maybe)
+            --- 0-10 seconds remaining: +6 mult (fresh)
+            -- 10-30 seconds: +4 mult (good)
+            -- 30-50 seconds: +2 mult (aging)
+            -- 50-60 seconds: +1 mult (nearly expired)
+            -- 60+ seconds: Dissolves automatically
+---            
 ---             "Spoils" after 30sec? -1 mult per hand played (add badge and show status text)
 ---             if i decide on the spoiling mechanic +2 mult flat or smth idk
 ---     - DONE (no art) | Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds double its sell value to this mult 
