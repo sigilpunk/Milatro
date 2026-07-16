@@ -9,7 +9,7 @@
 	"badge_colour": "8389dd", 
 	"badge_text_colour": "FFFFFF", 
 	"display_name": "Milatro", 
-	"version": "0.0.2a", 
+	"version": "0.0.5a", 
 	"dependencies": [
 		"Steamodded (>=1.*)", 
 		"Lovely (>=0.6)"
