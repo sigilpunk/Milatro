@@ -972,14 +972,16 @@ SMODS.Joker {
                 })
                 add_jokers({chosen_joker})
                 print(chosen_joker)
-    
-                G.GAME.joker_buffer = 0
-                SMODS.destroy_cards(card, nil, nil, true)
-    
-                return {
+
+                card_eval_status_text(card, 'extra', nil, nil, nil, {
                     message = "see ya loser",
                     colour = G.C.DARK_EDITION
-                }
+                })
+    
+                delay(0.7)
+
+                G.GAME.joker_buffer = 0
+                SMODS.destroy_cards(card, nil, nil, true)
             end
         end
     end,

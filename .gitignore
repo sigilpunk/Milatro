@@ -1,8 +1,6 @@
 .vscode
 Spilled Ink.png
 small ink.png
-*.ps1
-*.py
 *.zip
 .luarc.json
 .git
