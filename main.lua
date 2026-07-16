@@ -28,7 +28,11 @@
 ---     - DONE | Riff Raff but awesome: spawns one random good Milatro joker then fucking dies   
 ---     - DONE | Tritanopia: Cards give the same amount of mult as they do chips
 ---     - DONE | Revolutionary: (synergy with raised fist) raise lowest card in hand by one rank
----    -> Milk Joker: food joker, has time limit
+---    -> Milk Carton: food joker, has time limit
+---             "Drink" button: Start timer
+---             +1 mult per second left on the timer (60sec maybe)
+---             "Spoils" after 30sec? -1 mult per hand played (add badge and show status text)
+---             if i decide on the spoiling mechanic +2 mult flat or smth idk
 ---     - DONE (no art) | Sanctified Sword: When Blind is selected, Destroys every joker to the right and permanently adds double its sell value to this mult 
 
 -- Load order matters: core defines globals/helpers that later files depend on,
