@@ -11,7 +11,6 @@ SMODS.Rarity {
     badge_colour=G.C.DARK_EDITION
 }
 
-
 --- SYNERGY JOKERS
 -- Yaoi
 SMODS.Joker {
@@ -63,7 +62,7 @@ SMODS.Joker {
     blueprint_compat = true,
     perishable_compat = true,
     discovered = false,
-    rarity = "mltro_synergy_rarity", 
+    rarity = "mltro_synergy_rarity",
     cost = 0,
     config = {
         extra = {

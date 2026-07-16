@@ -68,10 +68,8 @@ joker_categories = {
         "j_mltro_syn_beelzebub",
         "j_mltro_syn_proletariat",
         "j_mltro_syn_awesome_riffraff",
-        "j_mltro_syn_pallete"
     },
     milatro_dogshit = {
-        "j_mltro_planets_vro",
         "j_mltro_jobapp",
         "j_mltro_fresh_lemon",
         "j_mltro_blue_card",
@@ -98,26 +96,56 @@ end
 
 
 function weighted_choice(weighted_pools)
-    local roll = pseudorandom(0,1)
+    local roll = pseudorandom(pseudoseed('mltro_weighted_choice'))
     local cumulative = 0
 
     for _, entry in ipairs(weighted_pools) do
         cumulative = cumulative + entry.weight
         if roll < cumulative then
-            local pool = entry.pool
-            return pool[pseudorandom(1, #pool)]
+            return pseudorandom_element(entry.pool, pseudoseed('mltro_weighted_choice_pool'))
         end
     end
+
+    local last_pool = weighted_pools[#weighted_pools].pool
+    return pseudorandom_element(last_pool, pseudoseed('mltro_weighted_choice_pool'))
 end
 
+-- Source - https://stackoverflow.com/a/53992026
+-- Posted by Nifim, modified by community. See post 'Timeline' for change history
+-- Retrieved 2026-07-15, License - CC BY-SA 4.0
+
+function table.deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[table.deepcopy(orig_key)] = table.deepcopy(orig_value)
+        end
+        setmetatable(copy, table.deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
+
 function table.choice(pool)
-    return pool[pseudorandom(1, #pool)]
+    return pseudorandom_element(pool, pseudoseed('mltro_table_choice'))
 end
 
 function table.extend(dest, src)
     for _, v in ipairs(src) do
         table.insert(dest, v)
     end
+end
+
+function table.extended(a, b)
+    local result = table.deepcopy(a)
+    for _, v in ipairs(b) do
+        table(result, v)
+    end
+    return result
 end
 
 -- Source - https://stackoverflow.com/q/1758991

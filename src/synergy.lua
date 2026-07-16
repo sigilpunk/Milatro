@@ -50,7 +50,46 @@ table.extend(joker_categories.milatro_syn_pack_blacklist, joker_categories.legen
 
 for _,syn in pairs(synergies) do
     table.extend(joker_categories.milatro_syn_pack_pool, syn["required"])
-    table.extend(joker_categories.milatro_syn_pack_blacklist, syn["spawn"])
+end
+
+-- add synergetic badges to synergetic jokers
+for _,key in pairs(joker_categories.milatro_syn_pack_pool) do
+    if not string.find(key, "mltro") then
+        SMODS.Joker:take_ownership(
+            key,
+            {
+                set_badges = function(self, card, badges)
+                    badges[#badges+1] = create_badge(
+                        "Synergetic",
+                        G.C.DARK_EDITION,
+                        G.C.WHITE,
+                        0.8
+                    )
+                end
+            }
+        )
+    elseif nil then
+        local joker = SMODS.Jokers["j_"..key]
+        if joker then
+            local old_set_badges = joker.set_badges
+            joker.set_badges = function(self, card, badges)
+                if old_set_badges then
+                    old_set_badges(self, card, badges)
+                end
+
+                badges[#badges+1] = create_badge(
+                    "Synergetic",
+                    G.C.DARK_EDITION,
+                    G.C.WHITE,
+                    0.8
+                )
+            end
+        end
+    end
+end
+
+for _,syn in pairs(synergies) do
+    table.extend(joker_categories.milatro_syn_pack_blacklist, {syn["spawn"]})
 end
 
 for _,v in ipairs(joker_categories.milatro_syn_pack_blacklist) do
