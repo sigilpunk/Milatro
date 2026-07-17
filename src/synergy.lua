@@ -49,7 +49,15 @@ local synergies = {
 table.extend(joker_categories.milatro_syn_pack_blacklist, joker_categories.legendary)
 
 for _,syn in pairs(synergies) do
-    table.extend(joker_categories.milatro_syn_pack_pool, syn["required"])
+    local jokers_to_add = {}
+    local n = 1
+    for joker in syn["required"] do
+        if not joker.synergy then
+            jokers_to_add[n] = joker
+            n = n + 1
+        end
+    end
+        table.extend(joker_categories.milatro_syn_pack_pool, jokers_to_add)
 end
 
 -- add synergetic badges to synergetic jokers

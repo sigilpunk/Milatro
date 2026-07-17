@@ -148,7 +148,7 @@ SMODS.Joker {
 
     calculate = function (self, card, context)
         if context.setting_blind then
-            add_jokers({joker_categories.food[pseudorandom(1, #joker_categories.food)]})
+            add_jokers({joker_categories.food[pseudorandom("mltro_fridge_choice", 1, #joker_categories.food)]})
             return {
                 message = "Yummy!",
                 card = card
